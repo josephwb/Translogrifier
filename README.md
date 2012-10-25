@@ -11,15 +11,17 @@ Installation
 ---------------
 The easiest way to compile is to use the Makefile, and typing the following in a unix prompt:
 
-make
+	make
 
 Otherwise, type the following in a unix prompt:
-g++ -Wall Translogrifier.cpp -m64 -O3 -o Translogrifier
+
+	g++ -Wall Translogrifier.cpp -m64 -O3 -o Translogrifier
 
 Usage
 --------------
 To run, type:
-./Translogrifier [-t treefile] or [-p parameterfile] -n thinning [-b burnin] [-r num_runs] [-s suffix] [-count]
+
+	./Translogrifier [-t treefile] or [-p parameterfile] -n thinning [-b burnin] [-r num_runs] [-s suffix] [-count]
 
 where
 
