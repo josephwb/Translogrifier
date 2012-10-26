@@ -4,7 +4,7 @@ DEBUG = -g
 CFLAGS = -Wall -c -m64 -O3 -funroll-loops $(DEBUG)
 LFLAGS = -Wall -m64 $(DEBUG)
 
-Decisivator: $(OBJS)
+Translogrifier: $(OBJS)
 	$(CC) $(LFLAGS) $(OBJS) -o Translogrifier
 	
 Translogrifier.o: Translogrifier.cpp
