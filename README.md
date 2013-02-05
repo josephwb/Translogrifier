@@ -25,16 +25,16 @@ To run, type:
 
 where
 
-'treefile' contains trees, 'parameterfile' contains parameter sample log,
-'thinning' is the interval of resampling,
-'burnin' is the number of samples to be excluded at the beginning of the file,
-'num_runs' is, well, the number of runs to combine. Must have format: prefix.runx.[p/t/suffix], and
- - in this case, provide only the file prefix for treefile or parameterfile
-   e.g. for 'foo.run1.p' provide 'foo'
- - PLEASE NOTE: if combining multiple tree files, program assumes identical translation tables in each.
-'suffix' is an abnormal file suffix i.e. NOT '.p' (for parameters) or '.t' (for trees).
-'-count' specifies that samples are simply counted (possibly across files).
+	'treefile' contains trees, 'parameterfile' contains parameter sample log,
+	'thinning' is the interval of resampling,
+	'burnin' is the number of samples to be excluded at the beginning of the file,
+	'num_runs' is, well, the number of runs to combine. Must have format: prefix.runx.[p/t/suffix], and
+	 - in this case, provide only the file prefix for treefile or parameterfile
+	   e.g. for 'foo.run1.p' provide 'foo'
+	 - PLEASE NOTE: if combining multiple tree files, program assumes identical translation tables in each.
+	'suffix' is an abnormal file suffix i.e. NOT '.p' (for parameters) or '.t' (for trees).
+	'-count' specifies that samples are simply counted (possibly across files).
 
-*** NOTE *** All values are in terms of number of SAMPLES (NOT generations).
-
-*** NOTE *** All line returns are expected to be in unix format. This is not checked.
+###NOTE###
+All values are in terms of number of SAMPLES (NOT generations).
+All line returns are expected to be in unix format. This is not checked.
