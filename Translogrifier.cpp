@@ -43,6 +43,8 @@ where
 TODO: allow multiple files - DONE!
  - check that parameter log files all contain the same number of parameters
 
+TODO: allow newick trees
+
 */
 
 #include <iostream>
@@ -79,9 +81,9 @@ void collectParametersAndThin (string const& fileName, int const& thinning, int 
 	int const& nruns, string & suffix);
 
 // version information
-double version = 0.3;
-string month = "May";
-int year = 2012;
+double version = 0.4;
+string month = "January";
+int year = 2013;
 
 int main(int argc, char *argv[]) {
 	string fileName;
@@ -121,17 +123,18 @@ int main(int argc, char *argv[]) {
 void printProgramInfo() {
 	cout << endl << 
 	"************************************************" << endl <<
-	"           Translogrifier version " << version    << endl <<
+	"          Translogrifier version " << version    << endl <<
 	"                Joseph W. Brown"                  << endl <<
 	"             University of Michigan"              << endl <<
 	"            Museum of Zoology (Birds)"            << endl <<
-	"        Complaints: josephwb@uidaho.edu"          << endl <<
+	"        Complaints: josephwb@umich.edu"          << endl <<
 	"                 " << month <<", " << year <<        endl << 
 	"************************************************" << endl << endl;
 }
 
 void processCommandLineArguments(int argc, char *argv[], string & fileName, int & thinning,
-	int & burnin, string & type, int & nruns, string & suffix, bool & count) {
+	int & burnin, string & type, int & nruns, string & suffix, bool & count)
+{
 	if (argc == 1) {
 		cout << "Enter the name of the log file to be thinned: ";
 		cin >> fileName;
@@ -151,44 +154,36 @@ void processCommandLineArguments(int argc, char *argv[], string & fileName, int 
 				<< "To run, type:" << endl;
 				printProgramUsage ();
 				exit(0);  
-			}
-			if (temp == "-t") {
+			} else if (temp == "-t") {
 				i++;
 				fileName = argv[i];
 				type = "tree";
 				continue;
-			}
-			if (temp == "-p") {
+			} else if (temp == "-p") {
 				i++;
 				fileName = argv[i];
 				type = "parameter";
 				continue;
-			}
-			if (temp == "-n") {
+			} else if (temp == "-n") {
 				i++;
 				thinning = convertStringtoInt(argv[i]);
 				continue;
-			}
-			if (temp == "-b") {
+			} else if (temp == "-b") {
 				i++;
 				burnin = convertStringtoInt(argv[i]);
 				continue;
-			}
-			if (temp == "-r") {
+			} else if (temp == "-r") {
 				i++;
 				nruns = convertStringtoInt(argv[i]);
 				continue;
-			}
-			if (temp == "-s") {
+			} else if (temp == "-s") {
 				i++;
 				suffix = argv[i];
 				continue;
-			}
-			if (temp == "-count") {
+			} else if (temp == "-count") {
 				count = true;
 				continue;
-			}
-			else {
+			} else {
 				cout
 				<< "Unknown command-line argument '" << argv[i] << "' encountered." << endl
 				<< endl
@@ -303,8 +298,7 @@ bool checkValidInputFile (string fileName) {
 	return validInput;
 }
 
-bool checkStringValue (string stringToParse, string stringToMatch, int stringPosition)
-{
+bool checkStringValue (string stringToParse, string stringToMatch, int stringPosition) {
 // Performs case-insenstive string match test
 	string testString = parseString(stringToParse, stringPosition);
 	if (testString.size() != stringToMatch.size()) {
