@@ -5,7 +5,11 @@ Overview
 A lightweight program to remove samples from the results of an MCMC analysis. 
 Samples may be either parameters or trees. Samples can undergo burnin and/or 
 thinning. All values are in terms of number of samples (NOT generations). If 
-the number of samples is unknown, the program can be used to count them.
+the number of samples is unknown, the program can be used to count them. At the 
+moment, minimal run indication is printed to screen (just which files are currently 
+being worked upon). If you have a single file (or large files), you may think 
+things have gone badly; but they haven't! As a benchmark, thinning a 9+ GB tree 
+log file takes ~2 minutes.
 
 Installation
 ---------------
