@@ -22,7 +22,7 @@ Otherwise, type the following in a unix prompt:
 g++ -Wall Translogrifier.cpp -m64 -O3 -o Translogrifier
 
 To run, type:
-./Translogrifier [-t treefile] or [-p parameterfile] -n thinning [-b burnin] [-r num_runs] [-s suffix] [-count]
+./Translogrifier [-t treefile] or [-p parameterfile] [-n thinning] [-b burnin] [-r num_runs] [-s suffix] [-count] [-h]
 
 where
 
@@ -35,6 +35,7 @@ where
  - PLEASE NOTE: if combining multiple tree files, program assumes identical translation tables in each.
 'suffix' is an abnormal file suffix i.e. NOT '.p' (for parameters) or '.t' (for trees).
 '-count' specifies that samples are simply counted (possibly across files).
+'-h' print this help.
 
 *** NOTE *** All values are in terms of number of SAMPLES (NOT generations).
 
@@ -147,8 +148,8 @@ void processCommandLineArguments(int argc, char *argv[], string & fileName, int 
 				cout
 				<< "Program description: Thins sample (tree or parameter) log files." << endl
 				<< endl
-				<< "To compile, type the following in a unix prompt:" << endl
-				<< "g++ -Wall Translogrifier.cpp -m64 -O3 -o Translogrifier" << endl
+				<< "To compile, type the following in a unix prompt:" << endl << endl
+				<< "make" << endl
 				<< endl
 				<< "To run, type:" << endl;
 				printProgramUsage ();
@@ -196,7 +197,7 @@ void processCommandLineArguments(int argc, char *argv[], string & fileName, int 
 }
 
 void printProgramUsage () {
-	cout << "./Translogrifier [-t treefile] or [-p parameterfile] -n thinning [-b burnin] [-r num_runs] [-s suffix] [-count]" << endl
+	cout << "./Translogrifier [-t treefile] or [-p parameterfile] [-n thinning] [-b burnin] [-r num_runs] [-s suffix] [-count] [-h]" << endl
 	<< endl
 	<< "where" << endl
 	<< endl
@@ -209,6 +210,7 @@ void printProgramUsage () {
 	<< " - PLEASE NOTE: if combining multiple tree files, program assumes identical translation tables in each." << endl
 	<< "'suffix' is an abnormal file suffix i.e. NOT '.p' (for parameters) or '.t' (for trees)." << endl
 	<< "'-count' specifies that samples are simply counted (possibly across files)." << endl
+	<< "'-h' prints this help" << endl
 	<< endl
 	<< "*** NOTE *** All values are in terms of number of SAMPLES (NOT generations)." <<endl << endl
 	<< "*** NOTE *** All line returns are expected to be in unix format. This is not checked." << endl << endl;
