@@ -595,6 +595,7 @@ void collectTreesAndThin (string const& fileName, int const& thinning, int const
 		int treeCounter = 0;		// Total samples
 		int sampleCounter = 0;		// Samples retained
 		string line;
+		bool treesEncountered = false;
 		
 	// Read in every non-empty (or non-whitespace), non-commented-out line
 		while (getline(treeInput,line)) {
@@ -603,16 +604,16 @@ void collectTreesAndThin (string const& fileName, int const& thinning, int const
 			commentLine = checkCommentLine(line);
 			whiteSpaceOnly = checkWhiteSpaceOnly(line);
 			if (line.empty() || commentLine || whiteSpaceOnly) {
-				if (i == 0) { // keep header from first file
+				if (i == 0) {
 					thinnedTrees << line << endl;
 				}
 				continue;
 			} else {
-				if (checkStringValue(line, "tree", stringPosition)) {
+				if (checkStringValue(line, "tree", stringPosition)) { // tree line
+					if (treeCounter == 0) treesEncountered = true;
 					if ((treeCounter-burnin) > 0 && (treeCounter-burnin) < thinning) {
 						treeCounter++;
 						totalTrees++;
-						//line.clear();
 						continue;
 					} else if ((treeCounter-burnin) == 0) {
 //    tree rep.1 = [something_maybe] ((((((((((((((4:0.3223,
@@ -623,7 +624,6 @@ void collectTreesAndThin (string const& fileName, int const& thinning, int const
 						totalTrees++;
 						sampleCounter++;
 						totalSamples++;
-						//line.clear();
 						continue;
 					} else if ((treeCounter-burnin) > 0 && (treeCounter-burnin) % thinning == 0) {
 						temp = removeStringElement(line, 0);
@@ -639,13 +639,10 @@ void collectTreesAndThin (string const& fileName, int const& thinning, int const
 						totalTrees++;
 						continue;
 					}
-				} else {
-					if (nruns == 1 && !checkStringValue(line, "end;", 0)) {
-						thinnedTrees << line << endl;
-					} else if (i == 0 && !checkStringValue(line, "end;", 0)) {
+				} else { // not a tree line. only care about first file here. don't want anything below trees
+					if (i == 0 && !treesEncountered) { // keep header from first file
 						thinnedTrees << line << endl;
 					}
-					//line.clear();
 				}
 			}
 		}

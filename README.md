@@ -42,3 +42,4 @@ where
 ###NOTE###
 All values are in terms of number of SAMPLES (NOT generations).
 All line returns are expected to be in unix format. This is not checked.
+Assumes that translation tables (if present) are identical across files. This is not yet checked.
