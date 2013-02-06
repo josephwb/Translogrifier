@@ -69,7 +69,7 @@ string removeStringPrefix (string stringToParse, char characterToRemove);
 int convertStringtoInt (string stringToConvert);
 string convertIntToString (int intToConvert);
 string removeStringElement (string stringToParse, int stringPosition);
-int countTreeSamples (string const& fileName, int const& nruns, string & suffix);
+void countTreeSamples (string const& fileName, int const& nruns, string & suffix);
 void countParameterSamples (string const& fileName, int const& nruns, string & suffix);
 
 // Specific user-influenced functions
@@ -92,7 +92,6 @@ int main(int argc, char *argv[]) {
 	int thinning = 1;
 	int burnin = 0;
 	int nruns = 1;
-	int numSamples = 0;
 	bool count = false;
 
 	printProgramInfo();
@@ -100,7 +99,7 @@ int main(int argc, char *argv[]) {
 	
 	if (count) { // simply count number of samples present i.e. file may be too large to read it directly
 		if (type == "tree") {
-			numSamples = countTreeSamples(fileName, nruns, suffix);
+			countTreeSamples(fileName, nruns, suffix);
 		} else if (type == "parameter") {
 			countParameterSamples(fileName, nruns, suffix);
 		}
@@ -127,7 +126,7 @@ void printProgramInfo() {
 	"                Joseph W. Brown"                  << endl <<
 	"             University of Michigan"              << endl <<
 	"            Museum of Zoology (Birds)"            << endl <<
-	"        Complaints: josephwb@umich.edu"          << endl <<
+	"         Complaints: josephwb@umich.edu"          << endl <<
 	"                 " << month <<", " << year <<        endl << 
 	"************************************************" << endl << endl;
 }
@@ -215,11 +214,53 @@ void printProgramUsage () {
 	<< "*** NOTE *** All line returns are expected to be in unix format. This is not checked." << endl << endl;
 }
 
-int countTreeSamples (string const& fileName, int const& nruns, string & suffix) {
-	int numSamples = 0;
+void countTreeSamples (string const& fileName, int const& nruns, string & suffix) {
+	int totalTrees = 0;
+	bool commentLine = false;
+	bool whiteSpaceOnly = false;
 	
+	if (suffix.empty()) {
+		suffix = "t";
+	}
 	
-	return(numSamples);
+	cout << "READING IN AND COUNTING TREE SAMPLES..." << endl << endl;
+	
+	for (int i = 0; i < nruns; i++) {
+		ifstream treeInput;
+		string currentFile = fileName;
+		if (nruns > 1) {
+// use MrBayes naming convention
+			string runNumber = convertIntToString((i +1));
+			currentFile = currentFile + ".run" + runNumber + "." + suffix;
+		}
+		
+		checkValidInputFile(currentFile);
+		treeInput.open(currentFile.c_str());
+		int treeCounter = 0;		// Total samples in current file
+		string line;
+		
+	// Read in every non-empty (or non-whitespace), non-commented-out line
+		while (getline(treeInput,line)) {
+			int stringPosition = 0;
+			string temp;
+			commentLine = checkCommentLine(line);
+			whiteSpaceOnly = checkWhiteSpaceOnly(line);
+			if (line.empty() || commentLine || whiteSpaceOnly) { // header
+				continue;
+			} else {
+				if (checkStringValue(line, "tree", stringPosition)) {
+					treeCounter++;
+				}
+			}
+		}
+		treeInput.close();
+		if (nruns > 1) {
+			cout << "Read " << treeCounter << " samples from file " << i+1 << " of " << nruns << "." << endl << endl;
+		}
+		totalTrees += treeCounter;
+	}
+	
+	cout << endl << "Read a total of " << totalTrees << " tree samples." << endl;
 }
 
 void countParameterSamples (string const& fileName, int const& nruns, string & suffix) {
@@ -231,8 +272,7 @@ void countParameterSamples (string const& fileName, int const& nruns, string & s
 		suffix = "p";
 	}
 	
-	cout << endl
-	<< "READING IN AND COUNTING PARAMETER SAMPLES..." << endl << endl;
+	cout << "READING IN AND COUNTING PARAMETER SAMPLES..." << endl << endl;
 	
 	for (int i = 0; i < nruns; i++) {
 		ifstream parameterInput;
@@ -267,14 +307,13 @@ void countParameterSamples (string const& fileName, int const& nruns, string & s
 		}
 		parameterInput.close();
 		if (nruns > 1) {
-			cout << "Retained " << parameterCounter << " samples from file " << i+1 << " of " << nruns << "." << endl << endl;
+			cout << "Read " << parameterCounter << " samples from file " << i+1 << " of " << nruns << "." << endl << endl;
 		}
 		numSamples += parameterCounter;
 	}
 	
 	cout << "Read a total of " << numSamples << " parameter samples." << endl;
 }
-
 
 bool checkValidInputFile (string fileName) {
 	bool validInput = false;
@@ -292,6 +331,7 @@ bool checkValidInputFile (string fileName) {
 		exit(1);
 	} else {
 		cout << "Successfully opened file '" << fileName << "'." <<  endl << endl;
+		validInput = true;
 		tempStream.close();
 		tempStream.clear();
 	}
@@ -349,8 +389,10 @@ string parseString (string stringToParse, int stringPosition) {
 	vector<string> tempVector;
 	istringstream tempStream(stringToParse);
 	string tempString;
-	while (tempStream >> tempString) {
+	int counter = 0;
+	while (tempStream >> tempString && counter <= stringPosition) {
 		tempVector.push_back(tempString);
+		counter++;
 	}
 	
 	return tempVector[stringPosition];
@@ -493,7 +535,8 @@ bool checkValidOutputFile (string & outputFileName) {
 }
 
 void collectTreesAndThin (string const& fileName, int const& thinning, int const& burnin,
-	string & suffix, int const& nruns) {
+	string & suffix, int const& nruns)
+{
 	ofstream thinnedTrees;
 	bool validFileName = false;
 	string tempFileName;
@@ -556,44 +599,45 @@ void collectTreesAndThin (string const& fileName, int const& thinning, int const
 		while (getline(treeInput,line)) {
 			int stringPosition = 0;
 			string temp;
-			
 			commentLine = checkCommentLine(line);
 			whiteSpaceOnly = checkWhiteSpaceOnly(line);
 			if (line.empty() || commentLine || whiteSpaceOnly) {
-				if (i == 0) {
+				if (i == 0) { // keep header from first file
 					thinnedTrees << line << endl;
 				}
 				continue;
 			} else {
 				if (checkStringValue(line, "tree", stringPosition)) {
-					if ((treeCounter-burnin) > 0 && (treeCounter-burnin) < thinning) {
-						treeCounter++;
-						totalTrees++;
-						line.clear();
+					treeCounter++;
+					totalTrees++;
+					if ((treeCounter-burnin) > 0 && (treeCounter-burnin) < thinning) { // first keeper
+						//treeCounter++;
+						//totalTrees++;
+						//line.clear();
 						continue;
 					} else if ((treeCounter-burnin) == 0) {
 //    tree rep.1 = [something_maybe] ((((((((((((((4:0.3223,
 						temp = removeStringElement(line, 0);
 						temp = removeStringElement(temp, 0); // will this work, or delete just the tab?
 						thinnedTrees << "tree STATE_" << totalTrees << temp << endl;
-						treeCounter++;
-						totalTrees++;
+						//treeCounter++;
+						//totalTrees++;
 						sampleCounter++;
 						totalSamples++;
-						line.clear();
+						//line.clear();
 						continue;
 					} else if ((treeCounter-burnin) > 0 && (treeCounter-burnin) % thinning == 0) {
 						temp = removeStringElement(line, 0);
 						temp = removeStringElement(temp, 0); // will this work, or delete just the tab?
 						thinnedTrees << "tree STATE_" << totalTrees << temp << endl;
-						treeCounter++;
-						totalTrees++;
+						//treeCounter++;
+						//totalTrees++;
 						sampleCounter++;
 						totalSamples++;
 						continue;
 					} else {
-						treeCounter++;
-						totalTrees++;
+						//treeCounter++;
+						//totalTrees++;
 						continue;
 					}
 				} else {
@@ -602,7 +646,7 @@ void collectTreesAndThin (string const& fileName, int const& thinning, int const
 					} else if (i == 0 && !checkStringValue(line, "end;", 0)) {
 						thinnedTrees << line << endl;
 					}
-					line.clear();
+					//line.clear();
 				}
 			}
 		}
@@ -617,7 +661,8 @@ void collectTreesAndThin (string const& fileName, int const& thinning, int const
 }
 
 void collectParametersAndThin (string const& fileName, int const& thinning, int const& burnin,
-	int const& nruns, string & suffix) {
+	int const& nruns, string & suffix)
+{
 	ofstream thinnedParameters;
 	bool validFileName = false;
 	string tempFileName;
@@ -699,7 +744,7 @@ void collectParametersAndThin (string const& fileName, int const& thinning, int 
 				if ((parameterCounter - burnin) > 0 && (parameterCounter - burnin) < thinning) {
 					parameterCounter++;
 					totalParameters++;
-					line.clear();
+					//line.clear();
 					continue;
 				} else if ((parameterCounter - burnin) == 0) { // Keep first sample
 					temp = removeStringElement(line, 0);
@@ -708,7 +753,7 @@ void collectParametersAndThin (string const& fileName, int const& thinning, int 
 					totalParameters++;
 					sampleCounter++;
 					totalSamples++;
-					line.clear();
+					//line.clear();
 					continue;
 				} else if ((parameterCounter - burnin) > 0 && (parameterCounter - burnin) % thinning == 0) {
 					temp = removeStringElement(line, 0);
