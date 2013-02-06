@@ -2,7 +2,7 @@ Translogrifier
 ==============
 Overview
 ---------------
-A lightweight program to remove samples from the results of an MCMC analysis. 
+A lightweight program to remove samples from the (potentially replicated) results of an MCMC analysis. 
 Samples may be either parameters or trees. Samples can undergo burnin and/or 
 thinning. All values are in terms of number of samples (NOT generations). If 
 the number of samples is unknown, the program can be used to count them. At the 
