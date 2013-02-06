@@ -413,7 +413,7 @@ string removeStringElement (string stringToParse, int stringPosition) {
 	}
 	
 	for (int i = 0; i < (int)tempVector.size(); i++) {
-		returnString  = returnString + "	" + tempVector[i];
+		returnString  = returnString + " " + tempVector[i];
 	}
 	
 	return returnString;
@@ -609,9 +609,7 @@ void collectTreesAndThin (string const& fileName, int const& thinning, int const
 				continue;
 			} else {
 				if (checkStringValue(line, "tree", stringPosition)) {
-					//treeCounter++;
-					//totalTrees++;
-					if ((treeCounter-burnin) > 0 && (treeCounter-burnin) < thinning) { // first keeper
+					if ((treeCounter-burnin) > 0 && (treeCounter-burnin) < thinning) {
 						treeCounter++;
 						totalTrees++;
 						//line.clear();
