@@ -82,7 +82,7 @@ void collectParametersAndThin (string const& fileName, int const& thinning, int 
 	int const& nruns, string & suffix);
 
 // version information
-double version = 0.4;
+double version = 0.41;
 string month = "January";
 int year = 2013;
 
@@ -126,7 +126,6 @@ void printProgramInfo() {
 	"          Translogrifier version " << version    << endl <<
 	"                Joseph W. Brown"                  << endl <<
 	"             University of Michigan"              << endl <<
-	"            Museum of Zoology (Birds)"            << endl <<
 	"         Complaints: josephwb@umich.edu"          << endl <<
 	"                 " << month <<", " << year <<        endl << 
 	"************************************************" << endl << endl;
@@ -610,20 +609,20 @@ void collectTreesAndThin (string const& fileName, int const& thinning, int const
 				continue;
 			} else {
 				if (checkStringValue(line, "tree", stringPosition)) {
-					treeCounter++;
-					totalTrees++;
+					//treeCounter++;
+					//totalTrees++;
 					if ((treeCounter-burnin) > 0 && (treeCounter-burnin) < thinning) { // first keeper
-						//treeCounter++;
-						//totalTrees++;
+						treeCounter++;
+						totalTrees++;
 						//line.clear();
 						continue;
 					} else if ((treeCounter-burnin) == 0) {
 //    tree rep.1 = [something_maybe] ((((((((((((((4:0.3223,
 						temp = removeStringElement(line, 0);
 						temp = removeStringElement(temp, 0); // will this work, or delete just the tab?
-						thinnedTrees << "tree STATE_" << totalTrees << temp << endl;
-						//treeCounter++;
-						//totalTrees++;
+						thinnedTrees << "tree STATE_" << totalSamples << temp << endl;
+						treeCounter++;
+						totalTrees++;
 						sampleCounter++;
 						totalSamples++;
 						//line.clear();
@@ -631,15 +630,15 @@ void collectTreesAndThin (string const& fileName, int const& thinning, int const
 					} else if ((treeCounter-burnin) > 0 && (treeCounter-burnin) % thinning == 0) {
 						temp = removeStringElement(line, 0);
 						temp = removeStringElement(temp, 0); // will this work, or delete just the tab?
-						thinnedTrees << "tree STATE_" << totalTrees << temp << endl;
-						//treeCounter++;
-						//totalTrees++;
+						thinnedTrees << "tree STATE_" << totalSamples << temp << endl;
+						treeCounter++;
+						totalTrees++;
 						sampleCounter++;
 						totalSamples++;
 						continue;
-					} else {
-						//treeCounter++;
-						//totalTrees++;
+					} else { // shouldn't get here
+						treeCounter++;
+						totalTrees++;
 						continue;
 					}
 				} else {
@@ -765,7 +764,7 @@ void collectParametersAndThin (string const& fileName, int const& thinning, int 
 					sampleCounter++;
 					totalSamples++;
 					continue;
-				} else {
+				} else { // shouldn't get here
 					parameterCounter++;
 					totalParameters++;
 					continue;
