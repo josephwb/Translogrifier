@@ -46,6 +46,18 @@ TODO: allow multiple files - DONE!
 
 TODO: allow newick trees
 
+TODO: allow arbitrarily named files passed in as a list
+
+TODO: update argument parsing; use get_opt
+
+TODO: make sure memory kept low through streaming
+
+TODO: check translation tables are identical
+
+TODO; when multiple files involved, use multiple threads
+
+TODO: move over to phyx
+
 */
 
 #include <iostream>
