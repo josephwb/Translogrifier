@@ -161,8 +161,10 @@ void countTreeSamples (string const& fileName, int const& nruns, string & suffix
 
 void countParameterSamples (string const& fileName, int const& nruns, string & suffix) {
     int numSamples = 0;
+    int numPars = 0;
     bool commentLine = false;
     bool whiteSpaceOnly = false;
+    vector <string> colnames;
     
     if (suffix.empty()) {
         suffix = "p";
@@ -184,17 +186,40 @@ void countParameterSamples (string const& fileName, int const& nruns, string & s
         
         int parameterCounter = 0;
         string line;
+        bool firstLine = true;
         
     // Read in every non-empty (or non-whitespace), non-commented-out line
-        while (getline(parameterInput,line)) {
-            int stringPosition = 0;
-            string temp;
+        while (getline(parameterInput, line)) {
+            //int stringPosition = 0;
+            //string temp;
             
             commentLine = checkCommentLine(line);
             whiteSpaceOnly = checkWhiteSpaceOnly(line);
             if (line.empty() || commentLine || whiteSpaceOnly) {
                 continue;
-            } else if (checkStringValue(line, "Gen", stringPosition) || checkStringValue(line, "state", stringPosition)) { // MrBayes or BEAST
+            //} else if (checkStringValue(line, "Gen", stringPosition) || checkStringValue(line, "state", stringPosition)) { // MrBayes or BEAST
+            } else if (firstLine) {
+                vector <string> header = tokenize(line);
+                int curpars = header.size();
+                if (i == 0) {
+                    numPars = curpars;
+                    colnames = header;
+                } else {
+                    // check that we've still got the same number of parameters i.e. files match
+                    if (curpars != numPars) {
+                        cout << "Error: number of parameters in file " << (i + 1)
+                            << "(" << curpars << ") does not match that from file 1 ("
+                            << numPars << "). Exiting." << endl;
+                        exit(0);
+                    } else if (header != colnames) {
+                        cout << "Error: header for file " << (i + 1)
+                            << "does not match that from file 1. Exiting." << endl;
+                        exit(0);
+                    }
+                    // check that the headers match (not just in length)
+                    
+                }
+                firstLine = false;
                 continue;
             } else {
                 parameterCounter++;
@@ -203,12 +228,25 @@ void countParameterSamples (string const& fileName, int const& nruns, string & s
         }
         parameterInput.close();
         if (nruns > 1) {
-            cout << "Read " << parameterCounter << " samples from file " << i+1 << " of " << nruns << "." << endl << endl;
+            cout << "Read " << parameterCounter << " samples (with " << numPars 
+                << " columns) from file " << (i + 1) << " of " << nruns << "." << endl << endl;
         }
         numSamples += parameterCounter;
     }
     
-    cout << "Read a total of " << numSamples << " parameter samples." << endl;
+    cout << "Read a total of " << numSamples << " parameter samples (with " << numPars 
+            << " columns)." << endl;
+}
+
+// assumes delimiter is some form of whitespace
+vector <string> tokenize (string const& input) {
+    vector <string> tokens;
+    string temp;
+    istringstream str(input);
+    while (str >> temp) {
+        tokens.push_back(temp);
+    }
+    return tokens;
 }
 
 bool checkValidInputFile (string fileName) {

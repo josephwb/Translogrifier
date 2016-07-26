@@ -1,6 +1,8 @@
 #ifndef _TLOG_H_
 #define _TLOG_H_
 
+#include <vector>
+
 using namespace std;
 
 void printProgramInfo ();
@@ -20,6 +22,7 @@ string convertIntToString (int intToConvert);
 string removeStringElement (string stringToParse, int stringPosition);
 void countTreeSamples (string const& fileName, int const& nruns, string & suffix);
 void countParameterSamples (string const& fileName, int const& nruns, string & suffix);
+vector <string> tokenize (string const& input);
 
 // Specific user-influenced functions
 void processCommandLineArguments (int argc, char *argv[], string & fileName, int & thinning,
