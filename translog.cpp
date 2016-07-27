@@ -27,7 +27,8 @@ void printProgramInfo() {
 }
 
 void processCommandLineArguments(int argc, char *argv[], string & fileName, int & thinning,
-    int & burnin, string & type, int & nruns, string & suffix, bool & count)
+    int & burnin, string & type, int & nruns, string & suffix, bool & count,
+    bool & overwrite)
 {
     if (argc == 1) {
         cout << "Enter the name of the log file to be thinned: ";
@@ -77,6 +78,9 @@ void processCommandLineArguments(int argc, char *argv[], string & fileName, int 
             } else if (temp == "-count") {
                 count = true;
                 continue;
+            } else if (temp == "-overwrite") {
+                overwrite = true;
+                continue;
             } else {
                 cout
                 << "Unknown command-line argument '" << argv[i] << "' encountered." << endl
@@ -91,7 +95,7 @@ void processCommandLineArguments(int argc, char *argv[], string & fileName, int 
 }
 
 void printProgramUsage () {
-    cout << "./Translogrifier [-t treefile] or [-p parameterfile] [-n thinning] [-b burnin] [-r num_runs] [-s suffix] [-count] [-h]" << endl
+    cout << "./Translogrifier [-t treefile] or [-p parameterfile] [-n thinning] [-b burnin] [-r num_runs] [-s suffix] [-count] [-overwrite] [-h]" << endl
     << endl
     << "where" << endl
     << endl
@@ -104,6 +108,7 @@ void printProgramUsage () {
     << " - PLEASE NOTE: if combining multiple tree files, program assumes identical translation tables in each." << endl
     << "'suffix' is an abnormal file suffix i.e. NOT '.p' (for parameters) or '.t' (for trees)." << endl
     << "'-count' specifies that samples are simply counted (possibly across files)." << endl
+    << "'-overwrite' will overwrite files without a warning message." << endl
     << "'-h' prints this help" << endl
     << endl
     << "*** NOTE *** All values are in terms of number of SAMPLES (NOT generations)." <<endl << endl
@@ -212,12 +217,11 @@ void countParameterSamples (string const& fileName, int const& nruns, string & s
                             << numPars << "). Exiting." << endl;
                         exit(0);
                     } else if (header != colnames) {
+                        // check that the headers match (not just in length)
                         cout << "Error: header for file " << (i + 1)
                             << "does not match that from file 1. Exiting." << endl;
                         exit(0);
-                    }
-                    // check that the headers match (not just in length)
-                    
+                    }  
                 }
                 firstLine = false;
                 continue;
@@ -469,7 +473,7 @@ bool checkValidOutputFile (string & outputFileName) {
 }
 
 void collectTreesAndThin (string const& fileName, int const& thinning, int const& burnin,
-    string & suffix, int const& nruns)
+    string & suffix, int const& nruns, bool & overwrite)
 {
     ofstream thinnedTrees;
     bool validFileName = false;
@@ -491,10 +495,12 @@ void collectTreesAndThin (string const& fileName, int const& thinning, int const
     
     tempFileName = tempFileName + "_thinned-" + convertIntToString(thinning) + "_burnin-" + convertIntToString(burnin) + ".trees";
     
-// Check if file exists/is writable
-    validFileName = false;
-    while (!validFileName) {
-        validFileName = checkValidOutputFile(tempFileName);
+    if (!overwrite) {
+        // Check if file exists/is writable
+        validFileName = false;
+        while (!validFileName) {
+            validFileName = checkValidOutputFile(tempFileName);
+        }
     }
     
     thinnedTrees.open(tempFileName.c_str());
@@ -590,7 +596,7 @@ void collectTreesAndThin (string const& fileName, int const& thinning, int const
 }
 
 void collectParametersAndThin (string const& fileName, int const& thinning, int const& burnin,
-    int const& nruns, string & suffix)
+    int const& nruns, string & suffix, bool & overwrite)
 {
     ofstream thinnedParameters;
     bool validFileName = false;
@@ -612,10 +618,12 @@ void collectParametersAndThin (string const& fileName, int const& thinning, int 
     
     tempFileName = tempFileName + "_thinned-" + convertIntToString(thinning) + "_burnin-" + convertIntToString(burnin) + "." + suffix;
         
-// Check if file exists/is writable
-    validFileName = false;
-    while (!validFileName) {
-        validFileName = checkValidOutputFile(tempFileName);
+    if (!overwrite) {
+        // Check if file exists/is writable
+        validFileName = false;
+        while (!validFileName) {
+            validFileName = checkValidOutputFile(tempFileName);
+        }
     }
     
     thinnedParameters.open(tempFileName.c_str());
@@ -652,19 +660,20 @@ void collectParametersAndThin (string const& fileName, int const& thinning, int 
         //bool headerEncountered = false;
         
     // Read in every non-empty (or non-whitespace), non-commented-out line
-        while (getline(parameterInput,line)) {
+        while (getline(parameterInput, line)) {
             int stringPosition = 0;
             string temp;
             
             commentLine = checkCommentLine(line);
             whiteSpaceOnly = checkWhiteSpaceOnly(line);
             if (line.empty() || commentLine || whiteSpaceOnly) {
+                // keep any comments from top of first file. don't really need this...
                 if (i == 0) {
                     thinnedParameters << line << endl;
                 }
                 continue;
             } else if (checkStringValue(line, "Gen", stringPosition) || checkStringValue(line, "state", stringPosition)) { // MrBayes or BEAST
-                //headerEncountered = true;
+                // keep header from first file
                 if (i == 0) {
                     thinnedParameters << line << endl;
                 }
@@ -673,7 +682,6 @@ void collectParametersAndThin (string const& fileName, int const& thinning, int 
                 if ((parameterCounter - burnin) > 0 && (parameterCounter - burnin) < thinning) {
                     parameterCounter++;
                     totalParameters++;
-                    //line.clear();
                     continue;
                 } else if ((parameterCounter - burnin) == 0) { // Keep first sample
                     temp = removeStringElement(line, 0);
@@ -682,7 +690,6 @@ void collectParametersAndThin (string const& fileName, int const& thinning, int 
                     totalParameters++;
                     sampleCounter++;
                     totalSamples++;
-                    //line.clear();
                     continue;
                 } else if ((parameterCounter - burnin) > 0 && (parameterCounter - burnin) % thinning == 0) {
                     temp = removeStringElement(line, 0);
@@ -692,7 +699,7 @@ void collectParametersAndThin (string const& fileName, int const& thinning, int 
                     sampleCounter++;
                     totalSamples++;
                     continue;
-                } else { // shouldn't get here
+                } else {
                     parameterCounter++;
                     totalParameters++;
                     continue;

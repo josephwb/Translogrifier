@@ -70,9 +70,11 @@ int main(int argc, char *argv[]) {
     int burnin = 0;
     int nruns = 1;
     bool count = false;
+    bool overwrite = false;
 
     printProgramInfo();
-    processCommandLineArguments(argc, argv, fileName, thinning, burnin, type, nruns, suffix, count);
+    processCommandLineArguments(argc, argv, fileName, thinning, burnin, type,
+        nruns, suffix, count, overwrite);
     
     if (count) { // simply count number of samples present i.e. file may be too large to read it directly
         if (type == "tree") {
@@ -82,9 +84,9 @@ int main(int argc, char *argv[]) {
         }
     } else {
         if (type == "tree") {
-            collectTreesAndThin(fileName, thinning, burnin, suffix, nruns);
+            collectTreesAndThin(fileName, thinning, burnin, suffix, nruns, overwrite);
         } else if (type == "parameter") {
-            collectParametersAndThin(fileName, thinning, burnin, nruns, suffix);
+            collectParametersAndThin(fileName, thinning, burnin, nruns, suffix, overwrite);
         }
     }
     

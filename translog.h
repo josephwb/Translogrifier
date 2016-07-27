@@ -26,10 +26,11 @@ vector <string> tokenize (string const& input);
 
 // Specific user-influenced functions
 void processCommandLineArguments (int argc, char *argv[], string & fileName, int & thinning,
-    int & burnin, string & type, int & nruns, string & suffix, bool & count);
+    int & burnin, string & type, int & nruns, string & suffix, bool & count,
+    bool & overwrite);
 void collectTreesAndThin (string const& fileName, int const& thinning, int const& burnin,
-    string & suffix, int const& nruns);
+    string & suffix, int const& nruns, bool & overwrite);
 void collectParametersAndThin (string const& fileName, int const& thinning, int const& burnin,
-    int const& nruns, string & suffix);
+    int const& nruns, string & suffix, bool & overwrite);
 
 #endif /* _TLOG_H_ */
