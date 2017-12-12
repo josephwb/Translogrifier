@@ -40,5 +40,7 @@ All values are in terms of number of SAMPLES (NOT generations).
 All line returns are expected to be in unix format. This is not checked.
 Assumes that translation tables (if present) are identical across files. This is not yet checked.
 
-### UPDATE
-I am moving all of this over to [phyx](https://github.com/FePhyFoFum/phyx).
+UPDATE
+--------------
+This is now implemented in the [phyx](https://github.com/FePhyFoFum/phyx) program `pxlog`.
+.
