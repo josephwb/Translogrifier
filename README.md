@@ -43,4 +43,4 @@ Assumes that translation tables (if present) are identical across files. This is
 UPDATE
 --------------
 This is now implemented in the [phyx](https://github.com/FePhyFoFum/phyx) program `pxlog`.
-.
+
