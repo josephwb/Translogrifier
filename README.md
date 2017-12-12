@@ -35,10 +35,10 @@ where
 	'suffix' is an abnormal file suffix i.e. NOT '.p' (for parameters) or '.t' (for trees).
 	'-count' specifies that samples are simply counted (possibly across files).
 
-###NOTE###
+### NOTE
 All values are in terms of number of SAMPLES (NOT generations).
 All line returns are expected to be in unix format. This is not checked.
 Assumes that translation tables (if present) are identical across files. This is not yet checked.
 
-###UPDATE###
+### UPDATE
 I am moving all of this over to [phyx](https://github.com/FePhyFoFum/phyx).
